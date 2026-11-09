@@ -27,7 +27,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const leave = () => {
     update((p) => ({ ...p, demo: null }));

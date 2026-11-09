@@ -280,7 +280,9 @@ function TerminalView({ def, s, run }: { def: MissionDef; s: SimState; run: (c: 
   const [hIdx, setHIdx] = useState<number | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const inputs = useMemo(() => s.terminal.filter((l) => l.kind === "input" && !l.text.startsWith("[painel]")).map((l) => l.text.replace(/^\$ /, "")), [s.terminal]);
-  useEffect(() => endRef.current?.scrollIntoView({ block: "nearest" }), [s.terminal.length]);
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: "nearest" });
+  }, [s.terminal.length]);
 
   return (
     <section className="panel flex h-[560px] flex-col overflow-hidden bg-terminal xl:sticky xl:top-20" aria-label="Terminal simulado">
