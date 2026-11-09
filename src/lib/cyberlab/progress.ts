@@ -45,7 +45,9 @@ export function useProgress(): ProgressData {
   return useSyncExternalStore(
     (cb) => {
       listeners.add(cb);
-      return () => listeners.delete(cb);
+      return () => {
+        listeners.delete(cb);
+      };
     },
     read,
     () => EMPTY,

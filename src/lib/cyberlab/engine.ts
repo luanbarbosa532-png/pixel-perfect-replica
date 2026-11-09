@@ -137,9 +137,19 @@ export function execute(
   }
 
   const parts = input.split(/\s+/);
-  const cmd = parts[0].toLowerCase();
+  const cmd = (parts[0] ?? "").toLowerCase();
   const arg = parts[1];
 
+  const KNOWN = [...Object.keys(INFO_COMMANDS), "investigate", "monitor", "close", ...allowedVerbs(def)];
+  if (!KNOWN.includes(cmd)) {
+    return reject(
+      s,
+      out,
+      cmd in ACTION_HELP
+        ? `"${cmd}" não está disponível neste cenário. Digite help.`
+        : `Comando desconhecido: "${cmd}". Este terminal só aceita comandos da simulação. Digite help.`,
+    );
+  }
   if (parts.length > 2) return reject(s, out, "Apenas um argumento é aceito. Ex.: investigate ALR-101");
   if (arg !== undefined && !SAFE_ARG.test(arg))
     return reject(s, out, "Argumento inválido. Use apenas IDs exibidos no painel (letras, números, hífen).");
@@ -241,7 +251,7 @@ export function execute(
             : `Comando desconhecido: "${cmd}". Este terminal só aceita comandos da simulação. Digite help.`,
         );
       }
-      if (!arg) return reject(s, out, ACTION_HELP[cmd]);
+      if (!arg) return reject(s, out, ACTION_HELP[cmd] ?? "Argumento obrigatório.");
       const d = def.defenses.find((x) => x.verb === cmd && x.target.toLowerCase() === arg.toLowerCase());
       const ent = findVisible(arg);
       if (!d || !ent) return reject(s, out, `"${cmd}" não pode ser aplicado a "${arg}" neste cenário.`);
