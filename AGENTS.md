@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## CyberLab architecture
+- Simulation logic lives in `src/lib/cyberlab/engine.ts` as pure functions; terminal and SOC panel both call `execute()` so they share one state. Why: consistency and testability.
+- Mission content is data in `missions.ts`; progression/unlock rules in `progress.ts` (localStorage demo layer, swap for Lovable Cloud later). Why: add missions without touching UI.
+- Recharts: pass literal oklch colors (SVG attrs ignore CSS vars) and never wrap `<Line>` in fragments/arrays. Why: lines silently don't render.
