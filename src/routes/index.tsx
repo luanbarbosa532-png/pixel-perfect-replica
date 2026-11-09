@@ -57,7 +57,7 @@ function Landing() {
             </div>
           </div>
           <div className="relative">
-            <img src={hero} alt="Estação de trabalho de um centro de operações de segurança com gráficos e terminal" width={1600} height={900} className="rounded-xl border border-border shadow-glow" />
+            <img src={hero} alt="Estação de trabalho de um centro de operações de segurança com gráficos e terminal" width={1600} height={912} className="rounded-xl border border-border shadow-glow" />
             <div className="panel absolute -bottom-6 left-4 right-4 bg-terminal p-4 font-mono text-xs md:left-8 md:right-auto md:w-96">
               <p className="text-muted-foreground">$ investigate LOG-AUTH</p>
               <p className="text-primary">✓ 203.0.113.45 gerou 398 falhas; 1 SUCCESS em admin.recepcao</p>

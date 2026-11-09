@@ -1,10 +1,10 @@
-import { createFileRoute, Link, Outlet, useMatchRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2 } from "lucide-react";
 import { AppShell, PageTitle } from "@/components/cyberlab/AppShell";
 import { LESSONS } from "@/lib/cyberlab/content";
 import { useProgress } from "@/lib/cyberlab/progress";
 
-export const Route = createFileRoute("/academia")({
+export const Route = createFileRoute("/academia/")({
   head: () => ({
     meta: [
       { title: "Academia — CyberLab" },
@@ -19,8 +19,6 @@ export const Route = createFileRoute("/academia")({
 });
 
 function Academia() {
-  const match = useMatchRoute();
-  if (match({ to: "/academia/$licaoId" })) return <Outlet />;
   return (
     <AppShell>
       <Lista />

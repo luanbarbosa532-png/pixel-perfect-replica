@@ -10,11 +10,25 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AcademiaRouteImport } from './routes/academia'
+import { Route as CampanhaRouteImport } from './routes/campanha'
 import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as AcademiaLicaoIdRouteImport } from './routes/academia.$licaoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademiaRoute = AcademiaRouteImport.update({
+  id: '/academia',
+  path: '/academia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CampanhaRoute = CampanhaRouteImport.update({
+  id: '/campanha',
+  path: '/campanha',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EntrarRoute = EntrarRouteImport.update({
@@ -22,31 +36,75 @@ const EntrarRoute = EntrarRouteImport.update({
   path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademiaLicaoIdRoute = AcademiaLicaoIdRouteImport.update({
+  id: '/$licaoId',
+  path: '/$licaoId',
+  getParentRoute: () => AcademiaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/academia': typeof AcademiaRouteWithChildren
+  '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
+  '/painel': typeof PainelRoute
+  '/academia/$licaoId': typeof AcademiaLicaoIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/academia': typeof AcademiaRouteWithChildren
+  '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
+  '/painel': typeof PainelRoute
+  '/academia/$licaoId': typeof AcademiaLicaoIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/academia': typeof AcademiaRouteWithChildren
+  '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
+  '/painel': typeof PainelRoute
+  '/academia/$licaoId': typeof AcademiaLicaoIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/entrar'
+  fullPaths:
+    | '/'
+    | '/academia'
+    | '/campanha'
+    | '/entrar'
+    | '/painel'
+    | '/academia/$licaoId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/entrar'
-  id: '__root__' | '/' | '/entrar'
+  to:
+    | '/'
+    | '/academia'
+    | '/campanha'
+    | '/entrar'
+    | '/painel'
+    | '/academia/$licaoId'
+  id:
+    | '__root__'
+    | '/'
+    | '/academia'
+    | '/campanha'
+    | '/entrar'
+    | '/painel'
+    | '/academia/$licaoId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AcademiaRoute: typeof AcademiaRouteWithChildren
+  CampanhaRoute: typeof CampanhaRoute
   EntrarRoute: typeof EntrarRoute
+  PainelRoute: typeof PainelRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +116,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/academia': {
+      id: '/academia'
+      path: '/academia'
+      fullPath: '/academia'
+      preLoaderRoute: typeof AcademiaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/campanha': {
+      id: '/campanha'
+      path: '/campanha'
+      fullPath: '/campanha'
+      preLoaderRoute: typeof CampanhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/entrar': {
       id: '/entrar'
       path: '/entrar'
@@ -65,12 +137,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/academia/$licaoId': {
+      id: '/academia/$licaoId'
+      path: '/$licaoId'
+      fullPath: '/academia/$licaoId'
+      preLoaderRoute: typeof AcademiaLicaoIdRouteImport
+      parentRoute: typeof AcademiaRoute
+    }
   }
 }
 
+interface AcademiaRouteChildren {
+  AcademiaLicaoIdRoute: typeof AcademiaLicaoIdRoute
+}
+
+const AcademiaRouteChildren: AcademiaRouteChildren = {
+  AcademiaLicaoIdRoute: AcademiaLicaoIdRoute,
+}
+
+const AcademiaRouteWithChildren = AcademiaRoute._addFileChildren(
+  AcademiaRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AcademiaRoute: AcademiaRouteWithChildren,
+  CampanhaRoute: CampanhaRoute,
   EntrarRoute: EntrarRoute,
+  PainelRoute: PainelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
