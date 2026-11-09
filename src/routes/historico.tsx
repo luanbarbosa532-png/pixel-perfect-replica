@@ -34,7 +34,7 @@ function Historico() {
     const xs = done.filter((a) => a.missionId === m.id);
     return { m, avg: xs.length ? Math.round(xs.reduce((s, a) => s + a.score.total, 0) / xs.length) : null, n: xs.length };
   });
-  const hardest = byCat.filter((c) => c.avg !== null).sort((a, b) => a.avg! - b.avg!)[0];
+  const hardest = byCat.filter((c) => c.avg !== null && c.avg < 70).sort((a, b) => a.avg! - b.avg!)[0];
 
   return (
     <>
@@ -67,7 +67,7 @@ function Historico() {
                   <XAxis dataKey="n" stroke="oklch(0.72 0.03 230)" fontSize={12} />
                   <YAxis domain={[0, 100]} stroke="oklch(0.72 0.03 230)" fontSize={12} />
                   <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)" }} />
-                  <Line dataKey="nota" stroke="oklch(0.86 0.2 150)" strokeWidth={2} dot />
+                  <Line isAnimationActive={false} dataKey="nota" stroke="oklch(0.86 0.2 150)" strokeWidth={2} dot />
                 </LineChart>
               </ResponsiveContainer>
             </div>
