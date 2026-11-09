@@ -269,13 +269,13 @@ function Chart({ def, s }: { def: MissionDef; s: SimState }) {
           <Legend wrapperStyle={{ fontSize: 12 }} />
           {def.traffic ? (
             <>
-              <Line dataKey="attack" name="Tráfego anômalo (req/s)" stroke=CHART.red strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Line dataKey="legit" name="Clientes (req/s)" stroke=CHART.cyan strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="attack" name="Tráfego anômalo (req/s)" stroke={CHART.red} strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="legit" name="Clientes (req/s)" stroke={CHART.cyan} strokeWidth={2} dot={false} isAnimationActive={false} />
             </>
           ) : (
             <>
-              <Line dataKey="risk" name="Risco" stroke=CHART.red strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Line dataKey="health" name="Saúde do serviço" stroke=CHART.green strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="risk" name="Risco" stroke={CHART.red} strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="health" name="Saúde do serviço" stroke={CHART.green} strokeWidth={2} dot={false} isAnimationActive={false} />
             </>
           )}
         </LineChart>
