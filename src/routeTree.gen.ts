@@ -10,20 +10,16 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AcademiaRouteImport } from './routes/academia'
 import { Route as CampanhaRouteImport } from './routes/campanha'
 import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as AcademiaIndexRouteImport } from './routes/academia.index'
 import { Route as AcademiaLicaoIdRouteImport } from './routes/academia.$licaoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AcademiaRoute = AcademiaRouteImport.update({
-  id: '/academia',
-  path: '/academia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CampanhaRoute = CampanhaRouteImport.update({
@@ -36,75 +32,93 @@ const EntrarRoute = EntrarRouteImport.update({
   path: '/entrar',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HistoricoRoute = HistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AcademiaIndexRoute = AcademiaIndexRouteImport.update({
+  id: '/academia/',
+  path: '/academia/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AcademiaLicaoIdRoute = AcademiaLicaoIdRouteImport.update({
-  id: '/$licaoId',
-  path: '/$licaoId',
-  getParentRoute: () => AcademiaRoute,
+  id: '/academia/$licaoId',
+  path: '/academia/$licaoId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/academia': typeof AcademiaRouteWithChildren
   '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
+  '/historico': typeof HistoricoRoute
   '/painel': typeof PainelRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/academia/': typeof AcademiaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/academia': typeof AcademiaRouteWithChildren
   '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
+  '/historico': typeof HistoricoRoute
   '/painel': typeof PainelRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/academia': typeof AcademiaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/academia': typeof AcademiaRouteWithChildren
   '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
+  '/historico': typeof HistoricoRoute
   '/painel': typeof PainelRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/academia/': typeof AcademiaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/academia'
     | '/campanha'
     | '/entrar'
+    | '/historico'
     | '/painel'
     | '/academia/$licaoId'
+    | '/academia/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/academia'
     | '/campanha'
     | '/entrar'
+    | '/historico'
     | '/painel'
     | '/academia/$licaoId'
+    | '/academia'
   id:
     | '__root__'
     | '/'
-    | '/academia'
     | '/campanha'
     | '/entrar'
+    | '/historico'
     | '/painel'
     | '/academia/$licaoId'
+    | '/academia/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AcademiaRoute: typeof AcademiaRouteWithChildren
   CampanhaRoute: typeof CampanhaRoute
   EntrarRoute: typeof EntrarRoute
+  HistoricoRoute: typeof HistoricoRoute
   PainelRoute: typeof PainelRoute
+  AcademiaLicaoIdRoute: typeof AcademiaLicaoIdRoute
+  AcademiaIndexRoute: typeof AcademiaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -114,13 +128,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/academia': {
-      id: '/academia'
-      path: '/academia'
-      fullPath: '/academia'
-      preLoaderRoute: typeof AcademiaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/campanha': {
@@ -137,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntrarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/historico': {
+      id: '/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/painel': {
       id: '/painel'
       path: '/painel'
@@ -144,34 +158,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PainelRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/academia/': {
+      id: '/academia/'
+      path: '/academia'
+      fullPath: '/academia/'
+      preLoaderRoute: typeof AcademiaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/academia/$licaoId': {
       id: '/academia/$licaoId'
-      path: '/$licaoId'
+      path: '/academia/$licaoId'
       fullPath: '/academia/$licaoId'
       preLoaderRoute: typeof AcademiaLicaoIdRouteImport
-      parentRoute: typeof AcademiaRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface AcademiaRouteChildren {
-  AcademiaLicaoIdRoute: typeof AcademiaLicaoIdRoute
-}
-
-const AcademiaRouteChildren: AcademiaRouteChildren = {
-  AcademiaLicaoIdRoute: AcademiaLicaoIdRoute,
-}
-
-const AcademiaRouteWithChildren = AcademiaRoute._addFileChildren(
-  AcademiaRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AcademiaRoute: AcademiaRouteWithChildren,
   CampanhaRoute: CampanhaRoute,
   EntrarRoute: EntrarRoute,
+  HistoricoRoute: HistoricoRoute,
   PainelRoute: PainelRoute,
+  AcademiaLicaoIdRoute: AcademiaLicaoIdRoute,
+  AcademiaIndexRoute: AcademiaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
