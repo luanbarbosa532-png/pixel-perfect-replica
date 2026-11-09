@@ -82,3 +82,28 @@ describe("auditoria: pontuação e consistência", () => {
     expect(s.terminal.at(-1)?.text).toContain("Comando desconhecido");
   });
 });
+
+describe("auditoria: todas as missões têm solução aprovável", () => {
+  const sol: Record<string, string[]> = {
+    "m2-forca-bruta": ["investigate ALR-201", "investigate LOG-AUTH", "investigate IP-ATACANTE", "block IP-ATACANTE", "mitigate PORTAL", "investigate IP-ESCRITORIO", "investigate ACC-ADMIN", "reset ACC-ADMIN"],
+    "m3-ddos": ["investigate ALR-301", "investigate EVD-TRAFEGO", "investigate FAIXA-BOT", "block FAIXA-BOT", "investigate ROTA-BUSCA", "mitigate ROTA-BUSCA", "report ALR-301"],
+    "m4-malware": ["investigate ALR-401", "investigate HOST-PC17", "isolate HOST-PC17", "investigate NET-C2", "block NET-C2", "investigate ARQ-FATURA", "report ALR-401", "restore HOST-PC17"],
+    "m5-final": ["investigate ALR-503", "investigate ACC-PEDRO", "reset ACC-PEDRO", "investigate HOST-ENG04", "isolate HOST-ENG04", "investigate NET-C2", "block NET-C2", "investigate ALR-501", "investigate FAIXA-BOT", "block FAIXA-BOT", "investigate ALR-502", "investigate DOM-FALSO", "block DOM-FALSO", "investigate EVD-PROXY", "report ALR-503"],
+  };
+  for (const [id, cmds] of Object.entries(sol)) {
+    it(`${id} é aprovável`, () => {
+      const { def, s } = run(id, cmds);
+      expect(s.invalidCommands).toBe(0);
+      expect(score(def, s).passed).toBe(true);
+    });
+  }
+  it("DDoS: bloquear todo o tráfego zera clientes e reprova", () => {
+    const { def, s } = run("m3-ddos", ["block TRAFEGO-GERAL"]);
+    expect(s.history.at(-1)?.legit).toBe(0);
+    expect(score(def, s).passed).toBe(false);
+  });
+  it("malware: restaurar antes de conter é recusado", () => {
+    const { s } = run("m4-malware", ["investigate ALR-401", "restore HOST-PC17"]);
+    expect(s.applied).not.toContain("restore:HOST-PC17");
+  });
+});
