@@ -16,6 +16,7 @@ import { Route as HistoricoRouteImport } from './routes/historico'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as AcademiaIndexRouteImport } from './routes/academia.index'
 import { Route as AcademiaLicaoIdRouteImport } from './routes/academia.$licaoId'
+import { Route as MissaoMissaoIdRouteImport } from './routes/missao.$missaoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const AcademiaLicaoIdRoute = AcademiaLicaoIdRouteImport.update({
   path: '/academia/$licaoId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MissaoMissaoIdRoute = MissaoMissaoIdRouteImport.update({
+  id: '/missao/$missaoId',
+  path: '/missao/$missaoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/historico': typeof HistoricoRoute
   '/painel': typeof PainelRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/missao/$missaoId': typeof MissaoMissaoIdRoute
   '/academia/': typeof AcademiaIndexRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/historico': typeof HistoricoRoute
   '/painel': typeof PainelRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/missao/$missaoId': typeof MissaoMissaoIdRoute
   '/academia': typeof AcademiaIndexRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/historico': typeof HistoricoRoute
   '/painel': typeof PainelRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/missao/$missaoId': typeof MissaoMissaoIdRoute
   '/academia/': typeof AcademiaIndexRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/historico'
     | '/painel'
     | '/academia/$licaoId'
+    | '/missao/$missaoId'
     | '/academia/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/historico'
     | '/painel'
     | '/academia/$licaoId'
+    | '/missao/$missaoId'
     | '/academia'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/historico'
     | '/painel'
     | '/academia/$licaoId'
+    | '/missao/$missaoId'
     | '/academia/'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   HistoricoRoute: typeof HistoricoRoute
   PainelRoute: typeof PainelRoute
   AcademiaLicaoIdRoute: typeof AcademiaLicaoIdRoute
+  MissaoMissaoIdRoute: typeof MissaoMissaoIdRoute
   AcademiaIndexRoute: typeof AcademiaIndexRoute
 }
 
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AcademiaLicaoIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/missao/$missaoId': {
+      id: '/missao/$missaoId'
+      path: '/missao/$missaoId'
+      fullPath: '/missao/$missaoId'
+      preLoaderRoute: typeof MissaoMissaoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   HistoricoRoute: HistoricoRoute,
   PainelRoute: PainelRoute,
   AcademiaLicaoIdRoute: AcademiaLicaoIdRoute,
+  MissaoMissaoIdRoute: MissaoMissaoIdRoute,
   AcademiaIndexRoute: AcademiaIndexRoute,
 }
 export const routeTree = rootRouteImport
