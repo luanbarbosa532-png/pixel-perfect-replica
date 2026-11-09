@@ -82,7 +82,7 @@ function Painel() {
                   <p className="text-sm font-medium">{i}. {m.title}</p>
                   <p className="text-xs text-muted-foreground">{m.org} · {m.incidentType}</p>
                 </div>
-                <StatusBadge status={statuses[i]} />
+                <StatusBadge status={statuses[i] ?? "bloqueada"} />
               </li>
             ))}
           </ul>

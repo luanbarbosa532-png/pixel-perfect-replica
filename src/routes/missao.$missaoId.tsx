@@ -325,11 +325,11 @@ function TerminalView({ def, s, run }: { def: MissionDef; s: SimState; run: (c: 
               e.preventDefault();
               const i = hIdx === null ? inputs.length - 1 : Math.max(0, hIdx - 1);
               setHIdx(i);
-              setValue(inputs[i]);
+              setValue(inputs[i] ?? "");
             } else if (e.key === "ArrowDown" && hIdx !== null) {
               e.preventDefault();
               const i = hIdx + 1;
-              if (i >= inputs.length) { setHIdx(null); setValue(""); } else { setHIdx(i); setValue(inputs[i]); }
+              if (i >= inputs.length) { setHIdx(null); setValue(""); } else { setHIdx(i); setValue(inputs[i] ?? ""); }
             }
           }}
           className="flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground/60"
