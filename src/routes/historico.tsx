@@ -63,11 +63,11 @@ function Historico() {
             <div className="mt-4 h-56">
               <ResponsiveContainer>
                 <LineChart data={series}>
-                  <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
-                  <XAxis dataKey="n" stroke="var(--muted-foreground)" fontSize={12} />
-                  <YAxis domain={[0, 100]} stroke="var(--muted-foreground)" fontSize={12} />
+                  <CartesianGrid stroke="oklch(0.32 0.035 250)" strokeDasharray="3 3" />
+                  <XAxis dataKey="n" stroke="oklch(0.72 0.03 230)" fontSize={12} />
+                  <YAxis domain={[0, 100]} stroke="oklch(0.72 0.03 230)" fontSize={12} />
                   <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)" }} />
-                  <Line dataKey="nota" stroke="var(--chart-1)" strokeWidth={2} dot />
+                  <Line dataKey="nota" stroke="oklch(0.86 0.2 150)" strokeWidth={2} dot />
                 </LineChart>
               </ResponsiveContainer>
             </div>

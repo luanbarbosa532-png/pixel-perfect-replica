@@ -44,3 +44,41 @@ describe("motor de simulação", () => {
     expect(lockReasons(def, { attempts: [], lessonsDone: [] })).toHaveLength(2);
   });
 });
+
+describe("auditoria: pontuação e consistência", () => {
+  it("decisões erradas reduzem a nota", () => {
+    const ok = ["investigate MSG-01", "investigate MSG-02", "investigate DOM-FALSO", "investigate EVD-PROXY", "quarantine MSG-01", "block DOM-FALSO", "reset ACC-ANA", "report MSG-01"];
+    const a = run("m1-phishing", ok);
+    const b = run("m1-phishing", [...ok, "quarantine MSG-02"]);
+    expect(score(b.def, b.s).total).toBeLessThan(score(a.def, a.s).total);
+    expect(score(a.def, a.s).passed).toBe(true);
+  });
+
+  it("encerrar sem agir não aprova", () => {
+    const { def, s } = run("m1-phishing", ["close"]);
+    expect(score(def, s).passed).toBe(false);
+    expect(s.status).toBe("ended");
+  });
+
+  it("conter tarde reduz a nota de tempo na força bruta", () => {
+    const fast = run("m2-forca-bruta", ["investigate ALR-201", "investigate LOG-AUTH", "investigate IP-ATACANTE", "block IP-ATACANTE", "mitigate PORTAL"]);
+    const slow = run("m2-forca-bruta", ["monitor", "monitor", "monitor", "monitor", "monitor", "monitor", "investigate ALR-201", "investigate LOG-AUTH", "investigate IP-ATACANTE", "block IP-ATACANTE", "mitigate PORTAL"]);
+    expect(score(fast.def, fast.s).time).toBe(10);
+    expect(score(slow.def, slow.s).time!).toBeLessThan(10);
+  });
+
+  it("controle do painel e comando do terminal produzem o mesmo estado", () => {
+    const def = getMission("m0-plantao")!;
+    const s0 = createInitialState(def, 0);
+    const t = execute(def, s0, "investigate ALR-001", "terminal");
+    const p = execute(def, s0, "investigate ALR-001", "painel");
+    expect(t.investigated).toEqual(p.investigated);
+    expect(t.risk).toBe(p.risk);
+    expect(t.revealed).toEqual(p.revealed);
+  });
+
+  it("comando desconhecido com vários argumentos é tratado como desconhecido", () => {
+    const { s } = run("m0-plantao", ["rm -rf /"]);
+    expect(s.terminal.at(-1)?.text).toContain("Comando desconhecido");
+  });
+});

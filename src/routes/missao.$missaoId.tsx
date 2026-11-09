@@ -37,6 +37,9 @@ export const Route = createFileRoute("/missao/$missaoId")({
   ),
 });
 
+// SVG attributes do not resolve CSS variables; keep in sync with --chart-* in styles.css.
+const CHART = { green: "oklch(0.86 0.2 150)", cyan: "oklch(0.82 0.13 205)", red: "oklch(0.66 0.21 25)" };
+
 function toAttempt(def: MissionDef, s: SimState, outcome: Attempt["outcome"]): Attempt {
   return {
     id: `${def.id}-${s.startedAt}-${Date.now()}`,
@@ -65,7 +68,7 @@ function MissionPage() {
     }
   }, [saved, reasons.length, def]);
 
-  if (reasons.length && !saved) {
+  if (reasons.length) {
     return (
       <div className="panel mx-auto max-w-lg p-8">
         <Lock className="size-6 text-muted-foreground" aria-hidden />
@@ -259,20 +262,20 @@ function Chart({ def, s }: { def: MissionDef; s: SimState }) {
     <div className="mt-4 h-44" role="img" aria-label={def.traffic ? "Gráfico de tráfego legítimo e de ataque por ciclo" : "Gráfico de risco e saúde do serviço por ciclo"}>
       <ResponsiveContainer>
         <LineChart data={data}>
-          <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" />
-          <XAxis dataKey="tick" stroke="var(--muted-foreground)" fontSize={11} />
-          <YAxis stroke="var(--muted-foreground)" fontSize={11} />
+          <CartesianGrid stroke="oklch(0.32 0.035 250)" strokeDasharray="3 3" />
+          <XAxis dataKey="tick" stroke="oklch(0.72 0.03 230)" fontSize={11} />
+          <YAxis stroke="oklch(0.72 0.03 230)" fontSize={11} />
           <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", fontSize: 12 }} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           {def.traffic ? (
             <>
-              <Line dataKey="attack" name="Tráfego anômalo (req/s)" stroke="var(--chart-3)" strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Line dataKey="legit" name="Clientes (req/s)" stroke="var(--chart-2)" strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="attack" name="Tráfego anômalo (req/s)" stroke=CHART.red strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="legit" name="Clientes (req/s)" stroke=CHART.cyan strokeWidth={2} dot={false} isAnimationActive={false} />
             </>
           ) : (
             <>
-              <Line dataKey="risk" name="Risco" stroke="var(--chart-3)" strokeWidth={2} dot={false} isAnimationActive={false} />
-              <Line dataKey="health" name="Saúde do serviço" stroke="var(--chart-1)" strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="risk" name="Risco" stroke=CHART.red strokeWidth={2} dot={false} isAnimationActive={false} />
+              <Line dataKey="health" name="Saúde do serviço" stroke=CHART.green strokeWidth={2} dot={false} isAnimationActive={false} />
             </>
           )}
         </LineChart>
