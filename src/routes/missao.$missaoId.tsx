@@ -267,15 +267,8 @@ function Chart({ def, s }: { def: MissionDef; s: SimState }) {
           <YAxis stroke="oklch(0.72 0.03 230)" fontSize={11} />
           <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", fontSize: 12 }} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
-          {def.traffic
-            ? [
-                <Line key="a" dataKey="attack" name="Tráfego anômalo (req/s)" stroke={CHART.red} strokeWidth={2} dot={false} isAnimationActive={false} />,
-                <Line key="l" dataKey="legit" name="Clientes (req/s)" stroke={CHART.cyan} strokeWidth={2} dot={false} isAnimationActive={false} />,
-              ]
-            : [
-                <Line key="r" dataKey="risk" name="Risco" stroke={CHART.red} strokeWidth={2} dot={false} isAnimationActive={false} />,
-                <Line key="h" dataKey="health" name="Saúde do serviço" stroke={CHART.green} strokeWidth={2} dot={false} isAnimationActive={false} />,
-              ]}
+          <Line dataKey={def.traffic ? "attack" : "risk"} name={def.traffic ? "Tráfego anômalo (req/s)" : "Risco"} stroke={CHART.red} strokeWidth={2} dot={false} isAnimationActive={false} />
+          <Line dataKey={def.traffic ? "legit" : "health"} name={def.traffic ? "Clientes (req/s)" : "Saúde do serviço"} stroke={def.traffic ? CHART.cyan : CHART.green} strokeWidth={2} dot={false} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>
