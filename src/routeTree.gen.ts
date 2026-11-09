@@ -10,33 +10,128 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CampanhaRouteImport } from './routes/campanha'
+import { Route as EntrarRouteImport } from './routes/entrar'
+import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as AcademiaIndexRouteImport } from './routes/academia.index'
+import { Route as AcademiaLicaoIdRouteImport } from './routes/academia.$licaoId'
+import { Route as MissaoMissaoIdRouteImport } from './routes/missao.$missaoId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CampanhaRoute = CampanhaRouteImport.update({
+  id: '/campanha',
+  path: '/campanha',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EntrarRoute = EntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoricoRoute = HistoricoRouteImport.update({
+  id: '/historico',
+  path: '/historico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademiaIndexRoute = AcademiaIndexRouteImport.update({
+  id: '/academia/',
+  path: '/academia/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcademiaLicaoIdRoute = AcademiaLicaoIdRouteImport.update({
+  id: '/academia/$licaoId',
+  path: '/academia/$licaoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MissaoMissaoIdRoute = MissaoMissaoIdRouteImport.update({
+  id: '/missao/$missaoId',
+  path: '/missao/$missaoId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/campanha': typeof CampanhaRoute
+  '/entrar': typeof EntrarRoute
+  '/historico': typeof HistoricoRoute
+  '/painel': typeof PainelRoute
+  '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/missao/$missaoId': typeof MissaoMissaoIdRoute
+  '/academia/': typeof AcademiaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/campanha': typeof CampanhaRoute
+  '/entrar': typeof EntrarRoute
+  '/historico': typeof HistoricoRoute
+  '/painel': typeof PainelRoute
+  '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/missao/$missaoId': typeof MissaoMissaoIdRoute
+  '/academia': typeof AcademiaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/campanha': typeof CampanhaRoute
+  '/entrar': typeof EntrarRoute
+  '/historico': typeof HistoricoRoute
+  '/painel': typeof PainelRoute
+  '/academia/$licaoId': typeof AcademiaLicaoIdRoute
+  '/missao/$missaoId': typeof MissaoMissaoIdRoute
+  '/academia/': typeof AcademiaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/campanha'
+    | '/entrar'
+    | '/historico'
+    | '/painel'
+    | '/academia/$licaoId'
+    | '/missao/$missaoId'
+    | '/academia/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/campanha'
+    | '/entrar'
+    | '/historico'
+    | '/painel'
+    | '/academia/$licaoId'
+    | '/missao/$missaoId'
+    | '/academia'
+  id:
+    | '__root__'
+    | '/'
+    | '/campanha'
+    | '/entrar'
+    | '/historico'
+    | '/painel'
+    | '/academia/$licaoId'
+    | '/missao/$missaoId'
+    | '/academia/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CampanhaRoute: typeof CampanhaRoute
+  EntrarRoute: typeof EntrarRoute
+  HistoricoRoute: typeof HistoricoRoute
+  PainelRoute: typeof PainelRoute
+  AcademiaLicaoIdRoute: typeof AcademiaLicaoIdRoute
+  MissaoMissaoIdRoute: typeof MissaoMissaoIdRoute
+  AcademiaIndexRoute: typeof AcademiaIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +143,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/campanha': {
+      id: '/campanha'
+      path: '/campanha'
+      fullPath: '/campanha'
+      preLoaderRoute: typeof CampanhaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/entrar': {
+      id: '/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof EntrarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/historico': {
+      id: '/historico'
+      path: '/historico'
+      fullPath: '/historico'
+      preLoaderRoute: typeof HistoricoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/academia/': {
+      id: '/academia/'
+      path: '/academia'
+      fullPath: '/academia/'
+      preLoaderRoute: typeof AcademiaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/academia/$licaoId': {
+      id: '/academia/$licaoId'
+      path: '/academia/$licaoId'
+      fullPath: '/academia/$licaoId'
+      preLoaderRoute: typeof AcademiaLicaoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/missao/$missaoId': {
+      id: '/missao/$missaoId'
+      path: '/missao/$missaoId'
+      fullPath: '/missao/$missaoId'
+      preLoaderRoute: typeof MissaoMissaoIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CampanhaRoute: CampanhaRoute,
+  EntrarRoute: EntrarRoute,
+  HistoricoRoute: HistoricoRoute,
+  PainelRoute: PainelRoute,
+  AcademiaLicaoIdRoute: AcademiaLicaoIdRoute,
+  MissaoMissaoIdRoute: MissaoMissaoIdRoute,
+  AcademiaIndexRoute: AcademiaIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
