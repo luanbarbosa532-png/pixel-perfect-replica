@@ -279,7 +279,7 @@ function TerminalView({ def, s, run }: { def: MissionDef; s: SimState; run: (c: 
   const [value, setValue] = useState("");
   const [hIdx, setHIdx] = useState<number | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
-  const inputs = useMemo(() => s.terminal.filter((l) => l.kind === "input" && !l.text.startsWith("[painel]")).map((l) => l.text.replace(/^\$ /, "")), [s.terminal]);
+  const inputs = useMemo(() => (s.commandHistory ?? s.terminal.filter((l) => l.kind === "input").map((l) => l.text)).filter((text) => !text.startsWith("[painel]")).map((text) => text.replace(/^\$ /, "")), [s.commandHistory, s.terminal]);
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: "nearest" });
   }, [s.terminal.length]);

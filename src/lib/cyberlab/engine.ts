@@ -94,6 +94,7 @@ export function createInitialState(def: MissionDef, now = Date.now()): SimState 
     ],
     timeline: [{ tick: 0, source: "sistema", text: "Chamado recebido pelo SOC.", tone: "info" }],
     history: [],
+    commandHistory: [],
     invalidCommands: 0,
     startedAt: now,
     endedAt: null,
@@ -125,7 +126,9 @@ export function execute(
   const input = rawInput.trim().slice(0, MAX_INPUT);
   const s: SimState = structuredClone(prev);
   if (!input) return prev;
-  const out: TermLine[] = [{ kind: "input", text: `${source === "painel" ? "[painel] " : ""}$ ${input}` }];
+  const inputText = `${source === "painel" ? "[painel] " : ""}$ ${input}`;
+  const out: TermLine[] = [{ kind: "input", text: inputText }];
+  s.commandHistory = [...(prev.commandHistory ?? prev.terminal.filter((l) => l.kind === "input").map((l) => l.text)), inputText];
   const say = (kind: TermLine["kind"], text: string) => out.push({ kind, text });
   const mark = (text: string, tone: TimelineEvent["tone"]) =>
     s.timeline.push({ tick: s.tick, source, text, tone });
@@ -192,7 +195,7 @@ export function execute(
       if (!withLogs.length) say("warn", "Nenhum registro coletado ainda. Investigue alertas e evidências primeiro.");
       withLogs.forEach((e) => {
         say("system", `── ${e.id} ──`);
-        e.logs!.forEach((l) => say("output", l));
+        e.logs?.forEach((l) => say("output", l));
       });
       break;
     }
@@ -202,7 +205,7 @@ export function execute(
       );
       break;
     case "history": {
-      const inputs = s.terminal.filter((l) => l.kind === "input").map((l) => l.text);
+      const inputs = s.commandHistory.slice(0, -1);
       if (!inputs.length) say("output", "Nenhum comando executado.");
       inputs.forEach((t, i) => say("output", `  ${i + 1}. ${t}`));
       break;
@@ -401,5 +404,5 @@ export function serviceLabel(h: number) {
 }
 
 export function actionCount(s: SimState) {
-  return s.terminal.filter((l) => l.kind === "input").length;
+  return s.commandHistory?.length ?? s.terminal.filter((l) => l.kind === "input").length;
 }

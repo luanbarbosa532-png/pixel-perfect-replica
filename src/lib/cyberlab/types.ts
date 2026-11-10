@@ -154,6 +154,8 @@ export interface SimState {
   containedAt: number | null;
   status: "active" | "ended";
   terminal: TermLine[];
+  /** Registro independente da tela; opcional para tentativas antigas. */
+  commandHistory?: string[];
   timeline: TimelineEvent[];
   history: Sample[];
   invalidCommands: number;
