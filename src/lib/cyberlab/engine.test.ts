@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createInitialState, execute, score } from "./engine";
+import { actionCount, createInitialState, execute, score } from "./engine";
 import { getMission } from "./missions";
 import { lockReasons } from "./progress";
 
@@ -46,6 +46,23 @@ describe("motor de simulação", () => {
 });
 
 describe("auditoria: pontuação e consistência", () => {
+  it("clear limpa só a tela e preserva ações e histórico", () => {
+    const { def, s } = run("m0-plantao", ["investigate ALR-001", "clear"]);
+    expect(s.terminal).toEqual([]);
+    expect(actionCount(s)).toBe(2);
+    expect(s.investigated).toEqual(["ALR-001"]);
+    const next = execute(def, s, "history");
+    expect(next.terminal.some((line) => line.text.includes("investigate ALR-001"))).toBe(true);
+    expect(actionCount(next)).toBe(3);
+  });
+
+  it("preserva comandos de tentativas antigas ao limpar a tela", () => {
+    const { def, s } = run("m0-plantao", ["investigate ALR-001"]);
+    delete s.commandHistory;
+    const next = execute(def, s, "clear");
+    expect(next.commandHistory).toEqual(["$ investigate ALR-001", "$ clear"]);
+    expect(actionCount(next)).toBe(2);
+  });
   it("decisões erradas reduzem a nota", () => {
     const ok = ["investigate MSG-01", "investigate MSG-02", "investigate DOM-FALSO", "investigate EVD-PROXY", "quarantine MSG-01", "block DOM-FALSO", "reset ACC-ANA", "report MSG-01"];
     const a = run("m1-phishing", ok);

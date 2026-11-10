@@ -33,3 +33,4 @@ use the editor.
 - Simulation logic lives in `src/lib/cyberlab/engine.ts` as pure functions; terminal and SOC panel both call `execute()` so they share one state. Why: consistency and testability.
 - Mission content is data in `missions.ts`; progression/unlock rules in `progress.ts` (localStorage demo layer, swap for Lovable Cloud later). Why: add missions without touching UI.
 - Recharts: pass literal oklch colors (SVG attrs ignore CSS vars) and never wrap `<Line>` in fragments/arrays. Why: lines silently don't render.
+- Keep command history separate from terminal display, with a fallback for older saved attempts. Why: clearing the screen must not erase audit records, action counts, or restart history.
