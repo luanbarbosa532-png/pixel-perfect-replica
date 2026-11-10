@@ -126,8 +126,9 @@ export function execute(
   const input = rawInput.trim().slice(0, MAX_INPUT);
   const s: SimState = structuredClone(prev);
   if (!input) return prev;
-  const out: TermLine[] = [{ kind: "input", text: `${source === "painel" ? "[painel] " : ""}$ ${input}` }];
-  s.commandHistory = [...(prev.commandHistory ?? prev.terminal.filter((l) => l.kind === "input").map((l) => l.text)), out[0].text];
+  const inputText = `${source === "painel" ? "[painel] " : ""}$ ${input}`;
+  const out: TermLine[] = [{ kind: "input", text: inputText }];
+  s.commandHistory = [...(prev.commandHistory ?? prev.terminal.filter((l) => l.kind === "input").map((l) => l.text)), inputText];
   const say = (kind: TermLine["kind"], text: string) => out.push({ kind, text });
   const mark = (text: string, tone: TimelineEvent["tone"]) =>
     s.timeline.push({ tick: s.tick, source, text, tone });
