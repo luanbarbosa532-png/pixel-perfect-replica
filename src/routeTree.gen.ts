@@ -13,7 +13,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as CampanhaRouteImport } from './routes/campanha'
 import { Route as EntrarRouteImport } from './routes/entrar'
 import { Route as HistoricoRouteImport } from './routes/historico'
+import { Route as LaboratorioRouteImport } from './routes/laboratorio'
 import { Route as PainelRouteImport } from './routes/painel'
+import { Route as PerfilRouteImport } from './routes/perfil'
 import { Route as AcademiaIndexRouteImport } from './routes/academia.index'
 import { Route as AcademiaLicaoIdRouteImport } from './routes/academia.$licaoId'
 import { Route as MissaoMissaoIdRouteImport } from './routes/missao.$missaoId'
@@ -38,9 +40,19 @@ const HistoricoRoute = HistoricoRouteImport.update({
   path: '/historico',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LaboratorioRoute = LaboratorioRouteImport.update({
+  id: '/laboratorio',
+  path: '/laboratorio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PainelRoute = PainelRouteImport.update({
   id: '/painel',
   path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PerfilRoute = PerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AcademiaIndexRoute = AcademiaIndexRouteImport.update({
@@ -64,7 +76,9 @@ export interface FileRoutesByFullPath {
   '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
   '/historico': typeof HistoricoRoute
+  '/laboratorio': typeof LaboratorioRoute
   '/painel': typeof PainelRoute
+  '/perfil': typeof PerfilRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
   '/missao/$missaoId': typeof MissaoMissaoIdRoute
   '/academia/': typeof AcademiaIndexRoute
@@ -74,7 +88,9 @@ export interface FileRoutesByTo {
   '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
   '/historico': typeof HistoricoRoute
+  '/laboratorio': typeof LaboratorioRoute
   '/painel': typeof PainelRoute
+  '/perfil': typeof PerfilRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
   '/missao/$missaoId': typeof MissaoMissaoIdRoute
   '/academia': typeof AcademiaIndexRoute
@@ -85,7 +101,9 @@ export interface FileRoutesById {
   '/campanha': typeof CampanhaRoute
   '/entrar': typeof EntrarRoute
   '/historico': typeof HistoricoRoute
+  '/laboratorio': typeof LaboratorioRoute
   '/painel': typeof PainelRoute
+  '/perfil': typeof PerfilRoute
   '/academia/$licaoId': typeof AcademiaLicaoIdRoute
   '/missao/$missaoId': typeof MissaoMissaoIdRoute
   '/academia/': typeof AcademiaIndexRoute
@@ -97,7 +115,9 @@ export interface FileRouteTypes {
     | '/campanha'
     | '/entrar'
     | '/historico'
+    | '/laboratorio'
     | '/painel'
+    | '/perfil'
     | '/academia/$licaoId'
     | '/missao/$missaoId'
     | '/academia/'
@@ -107,7 +127,9 @@ export interface FileRouteTypes {
     | '/campanha'
     | '/entrar'
     | '/historico'
+    | '/laboratorio'
     | '/painel'
+    | '/perfil'
     | '/academia/$licaoId'
     | '/missao/$missaoId'
     | '/academia'
@@ -117,7 +139,9 @@ export interface FileRouteTypes {
     | '/campanha'
     | '/entrar'
     | '/historico'
+    | '/laboratorio'
     | '/painel'
+    | '/perfil'
     | '/academia/$licaoId'
     | '/missao/$missaoId'
     | '/academia/'
@@ -128,7 +152,9 @@ export interface RootRouteChildren {
   CampanhaRoute: typeof CampanhaRoute
   EntrarRoute: typeof EntrarRoute
   HistoricoRoute: typeof HistoricoRoute
+  LaboratorioRoute: typeof LaboratorioRoute
   PainelRoute: typeof PainelRoute
+  PerfilRoute: typeof PerfilRoute
   AcademiaLicaoIdRoute: typeof AcademiaLicaoIdRoute
   MissaoMissaoIdRoute: typeof MissaoMissaoIdRoute
   AcademiaIndexRoute: typeof AcademiaIndexRoute
@@ -164,11 +190,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HistoricoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/laboratorio': {
+      id: '/laboratorio'
+      path: '/laboratorio'
+      fullPath: '/laboratorio'
+      preLoaderRoute: typeof LaboratorioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/painel': {
       id: '/painel'
       path: '/painel'
       fullPath: '/painel'
       preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/perfil': {
+      id: '/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof PerfilRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/academia/': {
@@ -200,7 +240,9 @@ const rootRouteChildren: RootRouteChildren = {
   CampanhaRoute: CampanhaRoute,
   EntrarRoute: EntrarRoute,
   HistoricoRoute: HistoricoRoute,
+  LaboratorioRoute: LaboratorioRoute,
   PainelRoute: PainelRoute,
+  PerfilRoute: PerfilRoute,
   AcademiaLicaoIdRoute: AcademiaLicaoIdRoute,
   MissaoMissaoIdRoute: MissaoMissaoIdRoute,
   AcademiaIndexRoute: AcademiaIndexRoute,

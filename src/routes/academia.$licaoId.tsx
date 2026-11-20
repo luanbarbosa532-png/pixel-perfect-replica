@@ -7,6 +7,7 @@ import { AppShell } from "@/components/cyberlab/AppShell";
 import { getLesson, type Exercise } from "@/lib/cyberlab/content";
 import { MISSIONS } from "@/lib/cyberlab/missions";
 import { update, useProgress } from "@/lib/cyberlab/progress";
+import { CodeStudy } from "@/components/cyberlab/CodeStudy";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/academia/$licaoId")({
@@ -38,7 +39,7 @@ function LessonPage() {
   const d = useProgress();
   const done = d.lessonsDone.includes(l.id);
   const mission = MISSIONS.find((m) => m.prereqLessons.includes(l.id));
-  const lines = l.code.source.split("\n");
+
 
   const markDone = () => {
     update((p) => ({ ...p, lessonsDone: p.lessonsDone.includes(l.id) ? p.lessonsDone : [...p.lessonsDone, l.id] }));
@@ -70,20 +71,7 @@ function LessonPage() {
 
       <section className="mt-8">
         <h2 className="text-xl font-semibold">Código didático comentado</h2>
-        <pre className="panel mt-3 overflow-x-auto bg-terminal p-4 font-mono text-xs leading-6" aria-label={`Código em ${l.code.language}`}>
-          {lines.map((ln, i) => (
-            <div key={i} className="flex">
-              <span className="w-8 shrink-0 select-none text-right text-muted-foreground/60">{i + 1}</span>
-              <code className={cn("pl-4", ln.trim().startsWith("#") ? "text-primary/80" : "text-foreground")}>{ln || " "}</code>
-            </div>
-          ))}
-        </pre>
-        <h3 className="mt-4 font-semibold">Explicação por partes</h3>
-        <dl className="mt-2 space-y-2 text-sm">
-          {l.code.parts.map((p) => (
-            <div key={p.lines} className="flex gap-3"><dt className="w-20 shrink-0 font-mono text-accent">linhas {p.lines}</dt><dd>{p.text}</dd></div>
-          ))}
-        </dl>
+        <div className="mt-3"><CodeStudy lesson={l} /></div>
       </section>
 
       <section className="mt-8">

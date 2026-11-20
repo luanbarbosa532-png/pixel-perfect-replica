@@ -1,11 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, Circle, Lock, RotateCcw, Search, Server, XCircle } from "lucide-react";
+import { Activity as ActivityIcon, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen, Terminal, FileText, Code2, ArrowUpRight, AlertTriangle, CheckCircle2, Circle, Lock, RotateCcw, Search, Server, XCircle } from "lucide-react";
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { AppShell } from "@/components/cyberlab/AppShell";
+import { CodeStudy } from "@/components/cyberlab/CodeStudy";
+import { EvidenceList, IndicatorList } from "@/components/cyberlab/EvidenceDetails";
 import { RiskBadge } from "@/components/cyberlab/StatusBadge";
 import { acknowledgeCritical, actionCount, createInitialState, defenseId, execute, isContained, objectiveMet, PASS_SCORE, score, serviceLabel, visibleEntities } from "@/lib/cyberlab/engine";
 import { getLesson } from "@/lib/cyberlab/content";
@@ -56,18 +58,19 @@ function toAttempt(def: MissionDef, s: SimState, outcome: Attempt["outcome"]): A
 
 function MissionPage() {
   const { missaoId } = Route.useParams();
-  const def = getMission(missaoId)!;
+  const def = getMission(missaoId);
   const d = useProgress();
-  const reasons = lockReasons(def, d);
-  const saved = d.active[def.id];
+  const reasons = def ? lockReasons(def, d) : [];
+  const saved = def ? d.active[def.id] : undefined;
   const [confirmRestart, setConfirmRestart] = useState(false);
 
   useEffect(() => {
-    if (!saved && reasons.length === 0) {
+    if (def && !saved && reasons.length === 0) {
       update((p) => (p.active[def.id] ? p : { ...p, active: { ...p.active, [def.id]: createInitialState(def) } }));
     }
   }, [saved, reasons.length, def]);
 
+  if (!def) return null;
   if (reasons.length) {
     return (
       <div className="panel mx-auto max-w-lg p-8">
@@ -137,123 +140,22 @@ function MissionPage() {
 
 // ------------------------------------------------------------------ LAB
 function Lab({ def, s, run, onRestart }: { def: MissionDef; s: SimState; run: (c: string, src: "terminal" | "painel") => void; onRestart: () => void }) {
-  const ents = visibleEntities(def, s);
-  const alerts = ents.filter((e) => e.kind === "alerta");
-  const others = ents.filter((e) => e.kind !== "alerta");
-  const allReq = def.objectives.filter((o) => o.required).every((o) => objectiveMet(o, s));
-  const defenses = def.defenses.filter((d) => ents.some((e) => e.id === d.target));
-
-  return (
-    <div>
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <Link to="/campanha" className="text-sm text-accent hover:underline">← Campanha</Link>
-          <h1 className="mt-1 text-2xl font-bold md:text-3xl">{def.title}</h1>
-          <p className="text-sm text-muted-foreground">{def.org} · {def.incidentType} · {def.difficulty}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" onClick={onRestart}><RotateCcw className="size-4" aria-hidden />Reiniciar</Button>
-          <Button size="sm" onClick={() => run("close", "painel")} variant={allReq ? "default" : "secondary"}>Encerrar e gerar relatório</Button>
-        </div>
-      </div>
-      <p className="panel mt-4 p-4 text-sm leading-relaxed">{def.briefing}</p>
-      {allReq && <p role="status" className="mt-3 rounded-md border border-primary/50 p-3 text-sm text-primary">Todos os objetivos obrigatórios foram cumpridos. Encerre a tentativa para ver o relatório.</p>}
-
-      <div className="mt-4 grid gap-4 xl:grid-cols-5">
-        <div className="xl:col-span-2"><TerminalView def={def} s={s} run={run} /></div>
-
-        <div className="space-y-4 xl:col-span-3">
-          <section className="panel p-4" aria-labelledby="estado">
-            <h2 id="estado" className="sr-only">Estado do incidente</h2>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div><p className="text-xs text-muted-foreground">Risco atual</p><div className="mt-1"><RiskBadge risk={s.risk} /></div><Progress value={s.risk} className="mt-2" aria-label="Risco" /></div>
-              <div><p className="flex items-center gap-1 text-xs text-muted-foreground"><Server className="size-3.5" aria-hidden />{def.serviceName}</p><p className="mt-1 text-sm font-semibold">{Math.round(s.health)}% · {serviceLabel(s.health)}</p><Progress value={s.health} className="mt-2" aria-label="Saúde do serviço" /></div>
-              <div><p className="text-xs text-muted-foreground">Ciclo / contenção</p><p className="mt-1 text-sm font-semibold">{s.tick}{def.escalation ? ` de ${def.escalation.deadline} (prazo)` : " · sem prazo"}</p><p className={cn("mt-1 text-xs", isContained(def, s) ? "text-primary" : "text-warning")}>{isContained(def, s) ? "Contido" : "Não contido"}</p></div>
-            </div>
-            <Chart def={def} s={s} />
-          </section>
-
-          <div className="grid gap-4 md:grid-cols-2">
-            <section className="panel p-4" aria-labelledby="al">
-              <h2 id="al" className="font-semibold">Alertas</h2>
-              <EntityList items={alerts} s={s} run={run} />
-              <h2 className="mt-4 font-semibold">Evidências e indicadores</h2>
-              <EntityList items={others} s={s} run={run} />
-            </section>
-            <div className="space-y-4">
-              <section className="panel p-4" aria-labelledby="def">
-                <h2 id="def" className="font-semibold">Controles de defesa</h2>
-                <p className="text-xs text-muted-foreground">Cada controle executa o comando equivalente no terminal.</p>
-                <div className="mt-3 space-y-2">
-                  {defenses.length === 0 && <p className="text-sm text-muted-foreground">Investigue para descobrir alvos de ação.</p>}
-                  {defenses.map((d) => {
-                    const id = defenseId(d);
-                    const applied = s.applied.includes(id);
-                    return (
-                      <Button key={id} variant="outline" size="sm" className={cn("h-auto w-full justify-between whitespace-normal py-2 text-left", applied && "border-primary/60")} disabled={applied} onClick={() => run(`${d.verb} ${d.target}`, "painel")}>
-                        <span>{d.label}</span>
-                        <span className="font-mono text-xs text-muted-foreground">{applied ? "aplicado" : `${d.verb} ${d.target}`}</span>
-                      </Button>
-                    );
-                  })}
-                  <Button variant="ghost" size="sm" className="w-full" onClick={() => run("monitor", "painel")}>Monitorar um ciclo</Button>
-                </div>
-              </section>
-              <section className="panel p-4" aria-labelledby="obj">
-                <h2 id="obj" className="font-semibold">Objetivos</h2>
-                <ul className="mt-2 space-y-1.5 text-sm">
-                  {def.objectives.map((o) => {
-                    const met = objectiveMet(o, s);
-                    return (
-                      <li key={o.id} className="flex gap-2">
-                        {met ? <CheckCircle2 className="size-4 shrink-0 text-primary" aria-label="Cumprido" /> : <Circle className="size-4 shrink-0 text-muted-foreground" aria-label="Pendente" />}
-                        <span>{o.label}{o.required ? "" : " (opcional)"}</span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            </div>
-          </div>
-
-          <section className="panel p-4" aria-labelledby="tl">
-            <h2 id="tl" className="font-semibold">Linha do tempo</h2>
-            <ol className="mt-2 max-h-56 space-y-1 overflow-y-auto font-mono text-xs">
-              {[...s.timeline].reverse().map((t, i) => (
-                <li key={i} className={cn(t.tone === "erro" && "text-destructive", t.tone === "alerta" && "text-warning", t.tone === "ok" && "text-primary")}>
-                  [c{String(t.tick).padStart(2, "0")}] [{t.source}] {t.tone === "erro" ? "ERRO: " : t.tone === "alerta" ? "ALERTA: " : ""}{t.text}
-                </li>
-              ))}
-            </ol>
-          </section>
-        </div>
-      </div>
+  const [left,setLeft]=useState(true); const [right,setRight]=useState(true);
+  const [mobileTab,setMobileTab]=useState("workspace"); const [tab,setTab]=useState("terminal");
+  const ents=visibleEntities(def,s);const allReq=def.objectives.filter(o=>o.required).every(o=>objectiveMet(o,s));
+  const complete=def.objectives.filter(o=>objectiveMet(o,s)).length; const lesson=getLesson(def.module);
+  const defenses=def.defenses.filter(d=>ents.some(e=>e.id===d.target));
+  const checklist=<><p className="section-heading">Objetivos da investigação</p><Progress value={complete/def.objectives.length*100} className="mt-3"/><p className="mt-2 font-mono text-[10px] text-muted-foreground">{complete}/{def.objectives.length} cumpridos</p><ul className="mt-4 space-y-3 text-xs">{def.objectives.map(o=><li key={o.id} className="flex gap-2">{objectiveMet(o,s)?<CheckCircle2 className="size-4 shrink-0 text-primary"/>:<Circle className="size-4 shrink-0 text-muted-foreground"/>}<span>{o.label}{!o.required&&<span className="block text-muted-foreground">Opcional</span>}</span></li>)}</ul></>;
+  return <div>
+    <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border pb-5"><div><Link to="/laboratorio" className="font-mono text-[10px] text-accent">LABORATÓRIO / CASO {def.order.toString().padStart(2,"0")}</Link><h1 className="mt-2 text-2xl font-bold">{def.title}</h1><p className="mt-2 text-xs text-muted-foreground">{def.org} · {def.incidentType} · {def.difficulty}</p></div><div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" onClick={onRestart}><RotateCcw/>Reiniciar</Button><Button size="sm" onClick={()=>run("close","painel")} variant={allReq?"default":"secondary"}>Encerrar e gerar relatório<ArrowUpRight/></Button></div></div>
+    {allReq&&<p role="status" className="mt-3 border-l-2 border-primary px-3 py-2 text-xs text-primary">Todos os objetivos obrigatórios foram cumpridos. Encerre a tentativa para ver o relatório.</p>}
+    <div role="tablist" aria-label="Áreas do laboratório" className="my-4 flex gap-1 xl:hidden">{[{id:"investigation",label:"Investigação"},{id:"workspace",label:"Área de trabalho"},{id:"incident",label:"Incidente"}].map(t=><Button key={t.id} role="tab" aria-selected={mobileTab===t.id} variant={mobileTab===t.id?"secondary":"ghost"} size="sm" onClick={()=>setMobileTab(t.id)}>{t.label}</Button>)}</div>
+    <div className={cn("lab-grid mt-5",!left&&"left-closed",!right&&"right-closed")}>
+      <aside className={cn("min-w-0 work-surface",mobileTab!=="investigation"&&"hidden xl:block")}><div className="flex items-center justify-between border-b border-border px-2 py-3">{left&&<h2 className="section-heading px-2">Investigação</h2>}<Button size="icon" variant="ghost" className="hidden xl:inline-flex" aria-label={left?"Recolher investigação":"Expandir investigação"} title={left?"Recolher investigação":"Expandir investigação"} onClick={()=>setLeft(!left)}>{left?<PanelLeftClose/>:<PanelLeftOpen/>}</Button></div><div className={cn("p-4",!left&&"xl:hidden")}><p className="section-heading">Briefing</p><p className="mt-3 text-xs leading-6 text-muted-foreground">{def.briefing}</p><div className="mt-6 border-t border-border pt-5">{checklist}</div><h2 className="section-heading mt-6 border-t border-border pt-5">Evidências disponíveis</h2><EvidenceList items={ents.filter(e=>e.kind!=="alerta")} def={def} s={s} run={run}/></div></aside>
+      <section className={cn("min-w-0",mobileTab!=="workspace"&&"hidden xl:block")}><div className="work-surface overflow-hidden"><div className="flex flex-wrap items-center gap-1 border-b border-border p-2" role="tablist" aria-label="Área de análise">{[{id:"terminal",label:"Terminal",icon:Terminal},{id:"logs",label:"Logs",icon:FileText},{id:"indicators",label:"Indicadores",icon:Search},{id:"python",label:"Python",icon:Code2}].map(t=><Button key={t.id} size="sm" role="tab" aria-selected={tab===t.id} variant={tab===t.id?"secondary":"ghost"} onClick={()=>setTab(t.id)}><t.icon/>{t.label}</Button>)}</div>{tab==="terminal"?<TerminalView def={def} s={s} run={run}/>:tab==="logs"?<div className="min-h-[520px] p-4"><h2 className="section-heading">Registros coletados</h2>{def.entities.filter(e=>s.investigated.includes(e.id)&&e.logs?.length).map(e=><div className="mt-4" key={e.id}><h3 className="font-mono text-xs text-accent">{e.id}</h3><pre className="mt-2 overflow-x-auto bg-terminal p-3 font-mono text-xs leading-6">{e.logs?.join("\n")}</pre></div>)}{!def.entities.some(e=>s.investigated.includes(e.id)&&e.logs?.length)&&<p className="mt-6 text-xs text-muted-foreground">Nenhum registro coletado. Analise as evidências.</p>}</div>:tab==="indicators"?<div className="min-h-[520px] p-4"><h2 className="section-heading">Indicadores analisados</h2><IndicatorList def={def} s={s}/></div>:lesson?<CodeStudy lesson={lesson}/>:<p className="p-4 text-sm">Este caso integrado usa os exemplos da Academia.</p>}</div><div className="mt-4 border-y border-border py-4"><div className="flex justify-between"><h2 className="section-heading">Evolução do incidente</h2><span className="font-mono text-[10px] text-muted-foreground">CICLO {s.tick}</span></div><Chart def={def} s={s}/></div></section>
+      <aside className={cn("work-surface min-w-0",mobileTab!=="incident"&&"hidden xl:block")}><div className="flex justify-between border-b border-border px-2 py-3">{right&&<h2 className="section-heading px-2">Estado do incidente</h2>}<Button variant="ghost" size="icon" className="hidden xl:inline-flex" aria-label={right?"Recolher incidente":"Expandir incidente"} title={right?"Recolher incidente":"Expandir incidente"} onClick={()=>setRight(!right)}>{right?<PanelRightClose/>:<PanelRightOpen/>}</Button></div><div className={cn("p-4",!right&&"xl:hidden")}><RiskBadge risk={s.risk}/><p className={cn("mt-3 text-xs",isContained(def,s)?"text-primary":"text-warning")}>{isContained(def,s)?"Contido / sem escalonamento":"Não contido"}</p><div className="mt-4 border-t border-border pt-4"><p className="flex items-center gap-2 text-xs text-muted-foreground"><Server className="size-4"/>{def.serviceName}</p><p className="mt-2 font-mono text-lg">{Math.round(s.health)}% <span className="text-xs text-muted-foreground">{serviceLabel(s.health)}</span></p><Progress value={s.health} className="mt-2"/>{def.escalation&&<p className="mt-2 text-xs text-warning">Prazo de contenção: {def.escalation.deadline} ciclos</p>}</div><h2 className="section-heading mt-5 border-t border-border pt-4">Alertas</h2><EvidenceList items={ents.filter(e=>e.kind==="alerta")} def={def} s={s} run={run}/><h2 className="section-heading mt-5 border-t border-border pt-4">Controles defensivos</h2><div className="mt-3 space-y-2">{defenses.map(d=>{const applied=s.applied.includes(defenseId(d));return <Button key={defenseId(d)} variant="outline" size="sm" className="h-auto w-full justify-start whitespace-normal py-2 text-left" disabled={applied} onClick={()=>run(`${d.verb} ${d.target}`,"painel")}><span>{d.label}<span className="mt-1 block font-mono text-[10px] text-muted-foreground">{applied?"Aplicado":`${d.verb} ${d.target}`}</span></span></Button>})}<Button size="sm" variant="secondary" className="w-full" onClick={()=>run("monitor","painel")}><ActivityIcon/>Monitorar um ciclo</Button></div><h2 className="section-heading mt-5 border-t border-border pt-4">Linha do tempo</h2><ol className="mt-3 max-h-64 space-y-3 overflow-y-auto text-xs">{[...s.timeline].reverse().map((t,i)=><li key={i} className={cn("border-l border-border pl-3",t.tone==="erro"&&"text-destructive",t.tone==="alerta"&&"text-warning",t.tone==="ok"&&"text-primary")}><span className="block font-mono text-[10px] text-muted-foreground">CICLO {t.tick} · {t.source}</span>{t.text}</li>)}</ol></div></aside>
     </div>
-  );
-}
-
-function EntityList({ items, s, run }: { items: ReturnType<typeof visibleEntities>; s: SimState; run: (c: string, src: "painel") => void }) {
-  if (!items.length) return <p className="mt-2 text-sm text-muted-foreground">Nada por aqui ainda.</p>;
-  return (
-    <ul className="mt-2 space-y-2">
-      {items.map((e) => {
-        const done = s.investigated.includes(e.id);
-        return (
-          <li key={e.id} className="animate-fade-up rounded-md border border-border p-2.5">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <p className="font-mono text-xs text-accent">{e.id}{e.severity ? ` · ${e.severity.toUpperCase()}` : ""} · {e.kind}</p>
-                <p className="text-sm font-medium break-words">{e.label}</p>
-                <p className="text-xs text-muted-foreground">{e.summary}</p>
-              </div>
-              {!done && <Button size="sm" variant="secondary" onClick={() => run(`investigate ${e.id}`, "painel")} aria-label={`Investigar ${e.id}`}><Search className="size-3.5" aria-hidden /></Button>}
-            </div>
-            {done && <p className="mt-2 border-l-2 border-primary/60 pl-2 text-xs">{e.finding}</p>}
-          </li>
-        );
-      })}
-    </ul>
-  );
+  </div>;
 }
 
 function Chart({ def, s }: { def: MissionDef; s: SimState }) {
@@ -285,11 +187,12 @@ function TerminalView({ def, s, run }: { def: MissionDef; s: SimState; run: (c: 
   }, [s.terminal.length]);
 
   return (
-    <section className="panel flex h-[560px] flex-col overflow-hidden bg-terminal xl:sticky xl:top-20" aria-label="Terminal simulado">
+    <section className="flex h-[560px] min-w-0 flex-col overflow-hidden bg-terminal" aria-label="Terminal simulado">
       <div className="flex items-center justify-between border-b border-border px-3 py-2 font-mono text-xs text-muted-foreground">
         <span>analista@soc-lab:~/{def.id}</span>
         <span>simulado · sem shell real</span>
       </div>
+      <div className="flex flex-wrap gap-1 border-b border-border p-2">{["help", "status", "evidence", "objectives", "history"].map(c => <Button key={c} variant="ghost" size="sm" className="font-mono text-[10px] text-accent" onClick={() => run(c, "terminal")}>{c}</Button>)}</div>
       <div className="flex-1 overflow-y-auto p-3 font-mono text-xs leading-5" role="log" aria-live="polite">
         {s.terminal.map((l, i) => (
           <p key={i} className={cn("whitespace-pre-wrap break-words", l.kind === "input" && "text-foreground", l.kind === "output" && "text-muted-foreground", l.kind === "ok" && "text-primary", l.kind === "error" && "text-destructive", l.kind === "warn" && "text-warning", l.kind === "system" && "text-accent")}>
@@ -328,7 +231,7 @@ function TerminalView({ def, s, run }: { def: MissionDef; s: SimState; run: (c: 
               if (i >= inputs.length) { setHIdx(null); setValue(""); } else { setHIdx(i); setValue(inputs[i] ?? ""); }
             }
           }}
-          className="flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground/60"
+          className="min-w-0 flex-1 bg-transparent text-foreground outline-none placeholder:text-muted-foreground/60"
           placeholder="digite um comando (help)"
           aria-label="Comando do terminal"
         />
@@ -410,6 +313,7 @@ function Report({ def, s, onRestart }: { def: MissionDef; s: SimState; onRestart
         </section>
       )}
 
+      <section className="mt-6 border-y border-border py-5"><h2 className="font-semibold">Evidências e indicadores analisados</h2><p className="mt-2 text-sm text-muted-foreground">{s.investigated.length} itens analisados · {s.linkedEvidence?.length ?? 0} explicitamente associados ao caso</p><ul className="mt-4 space-y-3">{def.entities.filter(e=>s.investigated.includes(e.id)).map(e=><li key={e.id} className="text-xs"><span className="font-mono text-accent">{e.id}{s.linkedEvidence?.includes(e.id)?" · associado ao caso":""}</span><p className="mt-1">{e.finding}</p></li>)}</ul></section><section className="mt-6"><h2 className="font-semibold">Linha do tempo das decisões</h2><ol className="mt-4 space-y-3 border-l border-border pl-4">{s.timeline.map((t,i)=><li key={i} className="text-xs"><span className="font-mono text-accent">Ciclo {t.tick} · {t.source}</span><p className="mt-1">{t.text}</p></li>)}</ol></section>
       <section className="panel mt-4 p-5">
         <h2 className="font-semibold">Próximos passos</h2>
         {lessons.length > 0 && (

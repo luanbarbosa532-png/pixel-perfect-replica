@@ -156,6 +156,8 @@ export interface SimState {
   terminal: TermLine[];
   /** Registro independente da tela; opcional para tentativas antigas. */
   commandHistory?: string[];
+  /** Evidence explicitly associated with this case; optional for older saves. */
+  linkedEvidence?: string[];
   timeline: TimelineEvent[];
   history: Sample[];
   invalidCommands: number;

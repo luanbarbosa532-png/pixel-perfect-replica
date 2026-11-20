@@ -26,6 +26,7 @@ export const INFO_COMMANDS: Record<string, string> = {
 };
 
 export const ACTION_HELP: Record<string, string> = {
+  link: "link <id> — associa uma evidência analisada ao caso",
   investigate: "investigate <id> — analisa um alerta, evidência ou indicador",
   monitor: "monitor — observa o ambiente por um ciclo sem agir",
   report: "report <id> — registra o incidente/reporte formal do item",
@@ -111,7 +112,7 @@ export function helpLines(def: MissionDef): string[] {
   const lines = ["Comandos de consulta:"];
   for (const [k, v] of Object.entries(INFO_COMMANDS)) lines.push(`  ${k.padEnd(11)} ${v}`);
   lines.push("Comandos de ação:");
-  for (const v of ["investigate", "monitor", ...allowedVerbs(def), "close"])
+  for (const v of ["investigate", "link", "monitor", ...allowedVerbs(def), "close"])
     lines.push(`  ${ACTION_HELP[v]}`);
   return lines;
 }
@@ -143,7 +144,7 @@ export function execute(
   const cmd = (parts[0] ?? "").toLowerCase();
   const arg = parts[1];
 
-  const KNOWN = [...Object.keys(INFO_COMMANDS), "investigate", "monitor", "close", ...allowedVerbs(def)];
+  const KNOWN = [...Object.keys(INFO_COMMANDS), "investigate", "link", "monitor", "close", ...allowedVerbs(def)];
   if (!KNOWN.includes(cmd)) {
     return reject(
       s,
@@ -208,6 +209,15 @@ export function execute(
       const inputs = s.commandHistory.slice(0, -1);
       if (!inputs.length) say("output", "Nenhum comando executado.");
       inputs.forEach((t, i) => say("output", `  ${i + 1}. ${t}`));
+      break;
+    }
+    case "link": {
+      const ent = findVisible(arg);
+      if (!ent || !s.investigated.includes(ent.id)) return reject(s, out, "Analise uma evidência visível antes de associá-la ao caso.");
+      if ((s.linkedEvidence ?? []).includes(ent.id)) { say("warn", "Evidência já associada ao caso."); break; }
+      s.linkedEvidence = [...(s.linkedEvidence ?? []), ent.id];
+      say("ok", `${ent.id} associada ao caso ${def.id}.`);
+      mark(`Associou ${ent.id} ao caso`, "info");
       break;
     }
     case "investigate": {
