@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Lock } from "lucide-react";
+import { Bug, Fish, KeyRound, ShieldCheck, Waves, Waypoints, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AppShell, PageTitle } from "@/components/cyberlab/AppShell";
 import { StatusBadge } from "@/components/cyberlab/StatusBadge";
@@ -11,9 +11,15 @@ export const Route = createFileRoute("/campanha")({
   head: () => ({
     meta: [
       { title: "Mapa da campanha — CyberLab" },
-      { name: "description", content: "Sequência de missões do CyberLab, do primeiro plantão à Operação Aurora." },
+      {
+        name: "description",
+        content: "Sequência de missões do CyberLab, do primeiro plantão à Operação Aurora.",
+      },
       { property: "og:title", content: "Mapa da campanha — CyberLab" },
-      { property: "og:description", content: "Seis missões progressivas de resposta a incidentes simulados." },
+      {
+        property: "og:description",
+        content: "Seis missões progressivas de resposta a incidentes simulados.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -27,21 +33,52 @@ export const Route = createFileRoute("/campanha")({
 
 function Campanha() {
   const d = useProgress();
+  const icons = [ShieldCheck, Fish, KeyRound, Waves, Bug, Waypoints];
   return (
     <>
-      <PageTitle title="Mapa da campanha" subtitle="Aprovação exige 70 pontos e todos os objetivos obrigatórios, sem falha crítica." />
+      <PageTitle
+        title="Mapa da campanha"
+        subtitle="Aprovação exige 70 pontos e todos os objetivos obrigatórios, sem falha crítica."
+      />
       <ol className="relative space-y-4 border-l-2 border-border pl-6">
         {MISSIONS.map((m, i) => {
           const st = missionStatus(m, d);
           const reasons = lockReasons(m, d);
           const best = bestScore(m.id, d);
+          const Icon = icons[i] ?? ShieldCheck;
           return (
             <li key={m.id} className="relative">
-              <span className={cn("absolute -left-[35px] top-5 grid size-6 place-items-center rounded-full border-2 bg-background font-mono text-xs", st === "concluida" ? "border-primary text-primary" : st === "bloqueada" ? "border-border text-muted-foreground" : "border-accent text-accent")} aria-hidden>{i}</span>
-              <article className={cn("panel p-5", st === "bloqueada" && "opacity-80", m.id === "m5-final" && "border-primary/40")}>
+              <span
+                className={cn(
+                  "absolute -left-[35px] top-5 grid size-6 place-items-center rounded-full border-2 bg-background font-mono text-xs",
+                  st === "concluida"
+                    ? "border-primary text-primary"
+                    : st === "bloqueada"
+                      ? "border-border text-muted-foreground"
+                      : "border-accent text-accent",
+                )}
+                aria-hidden
+              >
+                {i}
+              </span>
+              <article
+                className={cn(
+                  "border-b border-border py-6 pl-2",
+                  st === "bloqueada" && "opacity-80",
+                  m.id === "m5-final" && "border-l-2 border-accent bg-card px-5",
+                )}
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-mono text-xs text-muted-foreground">{m.incidentType} · {m.difficulty}</p>
+                    <p className="mb-3 flex items-center gap-2 font-mono text-xs text-accent">
+                      <Icon className="size-5" />
+                      {m.id === "m5-final"
+                        ? "OPERAÇÃO INTEGRADA"
+                        : `CASO ${i.toString().padStart(2, "0")}`}
+                    </p>
+                    <p className="font-mono text-xs text-muted-foreground">
+                      {m.incidentType} · {m.difficulty}
+                    </p>
                     <h2 className="mt-1 text-lg font-semibold">{m.title}</h2>
                     <p className="text-sm text-muted-foreground">{m.org}</p>
                   </div>
@@ -50,15 +87,34 @@ function Campanha() {
                     <StatusBadge status={st} />
                   </div>
                 </div>
-                <p className="mt-3 text-sm"><strong>Objetivo:</strong> {m.objective}</p>
+                <p className="mt-3 text-sm">
+                  <strong>Objetivo:</strong> {m.objective}
+                </p>
                 {st === "bloqueada" ? (
-                  <div className="mt-3 rounded-md border border-border p-3 text-sm">
-                    <p className="flex items-center gap-2 font-medium"><Lock className="size-4" aria-hidden />Para liberar:</p>
-                    <ul className="mt-1 list-disc pl-6 text-muted-foreground">{reasons.map((r) => <li key={r}>{r}</li>)}</ul>
+                  <div className="mt-4 border-l border-border pl-4 text-xs">
+                    <p className="flex items-center gap-2 font-medium">
+                      <Lock className="size-4" aria-hidden />
+                      Para liberar:
+                    </p>
+                    <ul className="mt-1 list-disc pl-6 text-muted-foreground">
+                      {reasons.map((r) => (
+                        <li key={r}>{r}</li>
+                      ))}
+                    </ul>
                   </div>
                 ) : (
-                  <Button asChild className="mt-4" variant={st === "concluida" ? "outline" : "default"}>
-                    <Link to="/missao/$missaoId" params={{ missaoId: m.id }}>{st === "em andamento" ? "Continuar" : st === "concluida" ? "Jogar novamente" : "Iniciar missão"}</Link>
+                  <Button
+                    asChild
+                    className="mt-4"
+                    variant={st === "concluida" ? "outline" : "default"}
+                  >
+                    <Link to="/missao/$missaoId" params={{ missaoId: m.id }}>
+                      {st === "em andamento"
+                        ? "Continuar"
+                        : st === "concluida"
+                          ? "Jogar novamente"
+                          : "Iniciar missão"}
+                    </Link>
                   </Button>
                 )}
               </article>

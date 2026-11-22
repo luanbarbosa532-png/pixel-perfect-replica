@@ -34,3 +34,6 @@ use the editor.
 - Mission content is data in `missions.ts`; progression/unlock rules in `progress.ts` (localStorage demo layer, swap for Lovable Cloud later). Why: add missions without touching UI.
 - Recharts: pass literal oklch colors (SVG attrs ignore CSS vars) and never wrap `<Line>` in fragments/arrays. Why: lines silently don't render.
 - Keep command history separate from terminal display, with a fallback for older saved attempts. Why: clearing the screen must not erase audit records, action counts, or restart history.
+- Derive SOC telemetry through overview.ts from saved simulation samples; never fabricate monitoring values. Why: filters and charts must reflect the same mission state.
+- Evidence associations use execute("link <id>") and optional linkedEvidence for legacy saves. Why: UI and terminal share persistent investigation records without changing existing grading weights.
+- CodeStudy validates structured Python answers without executing code. Why: learning stays controlled and inert.

@@ -3,10 +3,113 @@ import { Button } from "@/components/ui/button";
 import { update, useProgress } from "@/lib/cyberlab/progress";
 import type { Lesson } from "@/lib/cyberlab/content";
 export function HighlightCode({ source }: { source: string }) {
-  return <pre className="overflow-x-auto bg-terminal py-4 font-mono text-xs leading-6">{source.split("\n").map((line,i) => <div className="flex" key={i}><span className="w-10 shrink-0 select-none pr-3 text-right text-muted-foreground">{i+1}</span><code>{line.split(/(#.*$|"[^"\n]*"|'[^'\n]*'|\b(?:def|return|if|else|elif|for|in|import|from|class|True|False|not|and|or)\b|\b\d+\b)/g).map((part,j) => <span key={j} className={part.startsWith("#") ? "text-primary" : /^["']/.test(part) ? "text-warning" : /^(def|return|if|else|elif|for|in|import|from|class|True|False|not|and|or)$/.test(part) ? "text-accent" : "text-foreground"}>{part || " "}</span>)}</code></div>)}</pre>;
+  return (
+    <pre className="overflow-x-auto bg-terminal py-4 font-mono text-xs leading-6">
+      {source.split("\n").map((line, i) => (
+        <div className="flex" key={i}>
+          <span className="w-10 shrink-0 select-none pr-3 text-right text-muted-foreground">
+            {i + 1}
+          </span>
+          <code>
+            {line
+              .split(
+                /(#.*$|"[^"\n]*"|'[^'\n]*'|\b(?:def|return|if|else|elif|for|in|import|from|class|True|False|not|and|or)\b|\b\d+\b)/g,
+              )
+              .map((part, j) => (
+                <span
+                  key={j}
+                  className={
+                    part.startsWith("#")
+                      ? "text-primary"
+                      : /^["']/.test(part)
+                        ? "text-warning"
+                        : /^(def|return|if|else|elif|for|in|import|from|class|True|False|not|and|or)$/.test(
+                              part,
+                            )
+                          ? "text-accent"
+                          : "text-foreground"
+                  }
+                >
+                  {part || " "}
+                </span>
+              ))}
+          </code>
+        </div>
+      ))}
+    </pre>
+  );
 }
 export function CodeStudy({ lesson }: { lesson: Lesson }) {
-  const [answer,setAnswer] = useState(""); const [result,setResult] = useState<boolean|null>(null); const d = useProgress();
+  const [answer, setAnswer] = useState("");
+  const [result, setResult] = useState<boolean | null>(null);
+  const d = useProgress();
   const id = `python-${lesson.id}`;
-  return <section aria-label="Editor didático Python" className="work-surface overflow-hidden"><div className="flex justify-between border-b border-border px-4 py-3"><span className="font-mono text-xs">{lesson.id}.py</span><span className="text-xs text-warning">Exercício estruturado · sem execução</span></div><HighlightCode source={lesson.code.source} /><div className="border-t border-border p-4"><h3 className="text-sm font-semibold">Análise do código</h3><dl className="mt-3 space-y-3 text-xs">{lesson.code.parts.map(p => <div key={p.lines}><dt className="font-mono text-accent">Linhas {p.lines}</dt><dd className="mt-1 text-muted-foreground">{p.text}</dd></div>)}</dl><form className="mt-5 border-t border-border pt-4" onSubmit={e => {e.preventDefault(); const ok = answer.trim() === "return"; setResult(ok); update(p => ({...p,exercises:{...p.exercises,[id]:{correct:p.exercises[id]?.correct || ok,tries:(p.exercises[id]?.tries ?? 0)+1}}}));}}><label htmlFor={`code-${lesson.id}`} className="text-sm">Complete com a palavra Python que devolve o resultado da função.</label><div className="mt-3 flex items-center gap-2 font-mono text-xs"><input id={`code-${lesson.id}`} value={answer} onChange={e => {setAnswer(e.target.value);setResult(null);}} className="w-28 rounded border border-input bg-terminal px-2 py-2" placeholder="______" /><code>resultado</code><Button size="sm" variant="secondary" type="submit" disabled={!answer.trim()}>Verificar trecho</Button></div>{result !== null && <p role="status" className={`mt-3 text-xs ${result ? "text-primary" : "text-warning"}`}>{result ? "Correto. return devolve o resultado e encerra a função." : "Ainda não. Consulte as linhas que devolvem o resultado."}</p>}{d.exercises[id]?.correct && <p className="mt-2 text-xs text-primary">Trecho concluído</p>}</form></div></section>;
+  return (
+    <section aria-label="Editor didático Python" className="work-surface overflow-hidden">
+      <div className="flex justify-between border-b border-border px-4 py-3">
+        <span className="font-mono text-xs">{lesson.id}.py</span>
+        <span className="text-xs text-warning">Exercício estruturado · sem execução</span>
+      </div>
+      <HighlightCode source={lesson.code.source} />
+      <div className="border-t border-border p-4">
+        <h3 className="text-sm font-semibold">Análise do código</h3>
+        <dl className="mt-3 space-y-3 text-xs">
+          {lesson.code.parts.map((p) => (
+            <div key={p.lines}>
+              <dt className="font-mono text-accent">Linhas {p.lines}</dt>
+              <dd className="mt-1 text-muted-foreground">{p.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <form
+          className="mt-5 border-t border-border pt-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const ok = answer.trim() === "return";
+            setResult(ok);
+            update((p) => ({
+              ...p,
+              exercises: {
+                ...p.exercises,
+                [id]: {
+                  correct: p.exercises[id]?.correct || ok,
+                  tries: (p.exercises[id]?.tries ?? 0) + 1,
+                },
+              },
+            }));
+          }}
+        >
+          <label htmlFor={`code-${lesson.id}`} className="text-sm">
+            Complete com a palavra Python que devolve o resultado da função.
+          </label>
+          <div className="mt-3 flex items-center gap-2 font-mono text-xs">
+            <input
+              id={`code-${lesson.id}`}
+              value={answer}
+              onChange={(e) => {
+                setAnswer(e.target.value);
+                setResult(null);
+              }}
+              className="w-28 rounded border border-input bg-terminal px-2 py-2"
+              placeholder="______"
+            />
+            <code>resultado</code>
+            <Button size="sm" variant="secondary" type="submit" disabled={!answer.trim()}>
+              Verificar trecho
+            </Button>
+          </div>
+          {result !== null && (
+            <p role="status" className={`mt-3 text-xs ${result ? "text-primary" : "text-warning"}`}>
+              {result
+                ? "Correto. return devolve o resultado e encerra a função."
+                : "Ainda não. Consulte as linhas que devolvem o resultado."}
+            </p>
+          )}
+          {d.exercises[id]?.correct && (
+            <p className="mt-2 text-xs text-primary">Trecho concluído</p>
+          )}
+        </form>
+      </div>
+    </section>
+  );
 }
